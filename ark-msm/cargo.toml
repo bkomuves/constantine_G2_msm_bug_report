@@ -1,0 +1,14 @@
+[package]
+name = "msm-bug-sanity-check"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+ark-ec    = { version = "^0.4.0", default-features = false }
+ark-ff    = { version = "^0.4.0", default-features = false }
+ark-std   = { version = "^0.4.0", default-features = false, features = [ "std" ] }
+ark-bn254 = { version = "^0.4.0", default-features = false, features = [ "curve" ] }
+
+[[bin]]
+name = "main"
+path = "src/main.rs"
