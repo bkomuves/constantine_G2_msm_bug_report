@@ -50,6 +50,26 @@ proc printGP( pt: GP ) =
 
 #-------------------------------------------------------------------------------
 
+func msmNaiveG2( coeffs: seq[R] , points: seq[GA] ): GA =
+  let N = coeffs.len
+  assert( N == points.len, "incompatible sequence lengths" )
+
+  var s : GP
+  s.setInf()
+
+  for i in 0..<N:
+    var t : GP
+    t.fromAffine( points[i] )
+    t.scalarMul_vartime( coeffs[i].toBig() )
+    s += t
+
+  var r : GA
+  r.affine( s )
+
+  return r
+
+#-------------------------------------------------------------------------------
+
 proc loadZS() : seq[R] =
   let fname1 = "../data/zs.bin"
   let size = int(getFileSize(fname1))
@@ -72,11 +92,15 @@ proc loadB2() : seq[GA] =
   stream.close()
   return b2
 
+#-------------------------------------------------------------------------------
+
 proc prefixMSM(N: int, cs: seq[B], gs: seq[GA]) =
   var r : GP
   multiScalarMul_vartime( r, toOpenArray(cs, 0, N-1), toOpenArray(gs, 0, N-1) ) 
   echo("\nMSM of size " & $N)
   printGP(r)
+
+#---------------------------------------
 
 var zs = loadZS()
 let N = len(zs)
@@ -95,6 +119,10 @@ printGA(b2[1])
 printGA(b2[N-1])
 
 prefixMSM(N     , cs , b2)
+
+echo("\nreference *naive* MSM of size " & $N)
+printGA( msmNaiveG2( zs, b2 ) )
+
 prefixMSM(10000 , cs , b2)
 prefixMSM(1000  , cs , b2)
 prefixMSM(100   , cs , b2)
